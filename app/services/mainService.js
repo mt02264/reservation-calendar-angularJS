@@ -4,12 +4,14 @@ calendarApp.service("mainService", ["$http", function($http){
     this.calendarObject = {};
     const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    let locale = 'Asia/Dubai';
     let dt = new Date();
-    let day = dt.getDate();
-    let month = dt.getMonth();
-    let year = dt.getFullYear();
-    let offSet = dt.getTimezoneOffset()*60;
+    dt = moment.tz(dt,locale);
+    let day = dt.date();
+    let month = dt.month();
+    let year = dt.year();
     let reservedTenantsList={};
+
     // this.data = null;
    
 
@@ -67,7 +69,7 @@ calendarApp.service("mainService", ["$http", function($http){
     function setNextPrevMonthInCalendarObject(temp){
         self.calendarObject.month = temp[0];
         self.calendarObject.year = temp[1];
-        getTenants({"year":temp[1],"month":temp[0],"day":1}, to={"year":temp[1],"month":temp[0],"day":getDaysInCurrentMonth(temp[1], temp[0])});
+        getTenants({"year":temp[1],"month":temp[0],"day":1}, {"year":temp[1],"month":temp[0],"day":getDaysInCurrentMonth(temp[1], temp[0])});
         self.calendarObject.dateObject = getDateObject(self.calendarObject.year, self.calendarObject.month, 1);
         self.calendarObject.monthName = months[self.calendarObject.month];
     }
@@ -81,12 +83,13 @@ calendarApp.service("mainService", ["$http", function($http){
     }
 
     function getUnixFromDateTime(date){
-        return isValidMonth(date.month) ? new Date(date.year, date.month, date.day, 1).getTime()/1000 : "Month is not correct..";
+        console.log(date.year,date.month,date.day)
+        return isValidMonth(date.month) ? moment.tz(new Date(date.year, date.month, date.day, 1), locale).startOf('day').unix() : "Month is not correct..";
     }
 
     function getDateFromUnix(unix){
         //console.log(unix,new Date(unix*1000).getDate())
-        return new Date(unix*1000).getUTCDate();
+        return moment.unix(unix).tz(locale).startOf('day').date();
     }
 
     function saveTenants(tenantResponse){
@@ -98,17 +101,21 @@ calendarApp.service("mainService", ["$http", function($http){
         reservedTenantsList = {};
         for (let i=0; i<reservedData.length; i++){
             let reservedDate = getDateFromUnix(reservedData[i].time);
-            //console.log(reservedDate,reservedData[i],i);
+            console.log(reservedDate,reservedData[i],i);
             reservedTenantsList[reservedDate] = reservedData[i];
         }
 
         self.calendarObject.reservedTenantsList['data'] = reservedTenantsList;
     }
     
-    getTenants = async function(from={"year":year,"month":month,"day":1}, to={"year":year,"month":month,"day":getDaysInCurrentMonth(year, month)}, url="http://localhost:3000"){
+    getTenants = async function(
+                    from={"year":self.calendarObject.year,"month":self.calendarObject.month,"day":1},
+                    to={"year":self.calendarObject.year,"month":self.calendarObject.month,"day":getDaysInCurrentMonth(self.calendarObject.year, self.calendarObject.month)},
+                    url="http://localhost:3000"){
+        console.log(from,to)
         let fromUnixTime = getUnixFromDateTime(from);
         let toUnixTime = getUnixFromDateTime(to);
-        //console.log(fromUnixTime, toUnixTime)
+        console.log(fromUnixTime, toUnixTime,'fromTo')
         return this.data = $http.get(`${url}/reserve/${fromUnixTime}/${toUnixTime}`)
             .then( function (response){
                 updateReservedTenantsList(response.data.reserved);
@@ -116,8 +123,42 @@ calendarApp.service("mainService", ["$http", function($http){
                 this.error = reason.data;
             });
     }
+
+    this.addTenant = function(newTenantName, dateToReserve){
+        console.log(newTenantName,dateToReserve,'service');
+        let url = `http://localhost:3000/reserve/`;
+        let tenantDataToPush = {
+            "tennantName": newTenantName,
+            "time": getUnixFromDateTime(dateToReserve),
+            "reserved": true
+        };
+        $http.post(url, tenantDataToPush).success(function (data, status, headers, config) {
+                getTenants();
+            })
+            .error(function (data, status, header, config) {
+                responseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+    }
+
+    this.removeTenant = function(tenantInfo){
+        console.log(tenantInfo,'service');
+        let url = `http://localhost:3000/reserve/`;
+        tenantInfo["reserved"] = false;
+        $http.post(url, tenantInfo).success(function (data, status, headers, config) {
+                getTenants();
+            })
+            .error(function (data, status, header, config) {
+                responseDetails = "Data: " + data +
+                    "<hr />status: " + status +
+                    "<hr />headers: " + header +
+                    "<hr />config: " + config;
+            });
+    }
     
-    getTenants();
+    
 
     this.calendarObject = {
         weekdays,
@@ -127,5 +168,7 @@ calendarApp.service("mainService", ["$http", function($http){
         year,
         reservedTenantsList
     }
+
+    getTenants();
 
 }]);

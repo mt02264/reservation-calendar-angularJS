@@ -13,11 +13,13 @@ calendarApp.controller("modalController", ["$scope", "mainService", "$http", fun
     $scope.addTenant = function(newTenantName, dateToReserve){
         $scope.closeModal();
         console.log(newTenantName, dateToReserve);
+        mainService.addTenant(newTenantName, dateToReserve);
     }
 
     $scope.removeTenant = function(tenantInfo){
         $scope.closeModal();
         console.log(tenantInfo);
+        mainService.removeTenant(tenantInfo);
     }
     
     $scope.closeModal = function(){

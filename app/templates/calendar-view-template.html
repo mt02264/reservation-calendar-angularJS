@@ -1,16 +1,17 @@
 <div ng-controller="mainController">
-
     <div class="container text-center">
-        
+        <div class="row pt-4 "> 
+            <h1>Reservation Calendar using AngularJS</h1>
+        </div>
         <div class="row p-4 m-2">                
             <div class="col-3">
-                <button class="btn btn-info border" ng-click="goToPrevMonth()">Prev</button>
+                <button class="btn p-3 btn-info border" ng-click="goToPrevMonth()">Prev</button>
             </div>
             <div class="col-6">
                 <h2>{{calendar.monthName}} - {{calendar.year}}</h2>
             </div>
             <div class="col-3">
-                <button class="btn btn-info border" ng-click="goToNextMonth()">Next</button>
+                <button class="btn p-3 btn-info border" ng-click="goToNextMonth()">Next</button>
             </div>
         </div>
 
@@ -50,7 +51,7 @@
                             <input ng-model="newTenantName">
                         </div>
                         <div class="col" ng-show="tenantInfo != undefined">
-                            <h5>Residing Tenant Name: {{tenantInfo.tennantName}}</h5>
+                            <h5>Tenant Name: {{tenantInfo.tennantName}}</h5>
                         </div>
                     </div>
                     <div class="row p-3">
@@ -60,8 +61,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="closeModal()">Close</button>
-                        <button type="button" ng-disabled="newTenantName.length < 2" ng-click="addTenant(newTenantName, dateObj)" ng-show="tenantInfo == undefined" class="btn btn-primary">Add Tenant</button>
-                        <button type="button" ng-click="removeTenant(tenantInfo)" ng-show="tenantInfo != undefined" class="btn btn-primary">Remove Tenant</button>
+                        <button type="button" ng-disabled="newTenantName.length < 2" ng-click="addTenant(newTenantName, dateObj)" ng-show="tenantInfo == undefined" class="btn btn-success">Add Tenant</button>
+                        <button type="button" ng-click="removeTenant(tenantInfo)" ng-show="tenantInfo != undefined" class="btn btn-danger">Remove Tenant</button>
                     </div>
                 </div>
             </div>
