@@ -1,0 +1,38 @@
+<div ng-controller="mainController">
+
+    <div class="container text-center">
+        
+        <div class="row p-4 m-2">                
+            <div class="col-3">
+                <button class="btn btn-info border" ng-click="goToPrevMonth()">Prev</button>
+            </div>
+            <div class="col-6">
+                <h2>{{calendar.monthName}} - {{calendar.year}}</h2>
+            </div>
+            <div class="col-3">
+                <button class="btn btn-info border" ng-click="goToNextMonth()">Next</button>
+            </div>
+        </div>
+
+        <div class="row">
+                <div class="card text-center">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="seven-cols border-left border-right" ng-repeat="days in calendar.weekdays">{{days}}</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <button class="seven-cols p-4 border btn btn-secondary" ng-disabled="obj.status" ng-repeat="obj in calendar.dateObject" ng-click="showDateDetails(obj)" data-toggle="modal" data-target="#exampleModalCenter">{{obj.day}}</button>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Calendar
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <!-- <p>{{name}}</p>     -->
+
+</div>
