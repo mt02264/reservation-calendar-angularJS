@@ -3,9 +3,9 @@ calendarApp.controller("mainController", ["$scope", "mainService", function($sco
 
    $scope.calendar = mainService.calendarObject;
     
-   $scope.showDateDetails = function (dateObj){
-       console.log(dateObj);
-       $scope.$broadcast('objectBroadCastToModalController', dateObj);
+   $scope.showDateDetails = function (dateObj,tenantInfo){
+       console.log(dateObj,tenantInfo);
+       $scope.$broadcast('objectBroadCastToModalController', [dateObj,tenantInfo]);
        // mainService.updateTenant(dateObj);
    }
 
