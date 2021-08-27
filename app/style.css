@@ -4,3 +4,7 @@
     flex: 0 0 14.285714286%;
     max-width: 14.285714286%;
 }
+
+.custom-button-height{
+    height: 120px !important;
+}

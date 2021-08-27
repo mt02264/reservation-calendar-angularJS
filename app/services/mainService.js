@@ -1,42 +1,54 @@
 
 calendarApp.service("mainService", ["$http", function($http){
+    
+    // declares constants and variables for future use in functions
     const self = this;
     this.calendarObject = {};
     const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; 
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    let locale = 'Asia/Dubai';
+    let locale = 'GMT';
     let dt = new Date();
+    moment.tz.setDefault(locale);
     dt = moment.tz(dt,locale);
     let day = dt.date();
     let month = dt.month();
     let year = dt.year();
     let reservedTenantsList={};
 
-    // this.data = null;
-   
-
     function getdaysBeforeFirstDay(year, month){
+        // returns an index of first day [0-6] for the month-year 
         return new Date(year, month, 1).getDay();
     }
 
     function getDaysInCurrentMonth(year, month){
+    /* 
+        parameters : year and month
+        returns    : the last day of the month given [28-31] 
+    */
         return new Date(year, month+1, 0).getDate();
     }
         
     function getDateObject(year, month, day){
+    /* 
+        parameters : year, month and day
+        returns    : returns a date object which has key/value pairs
+                     key   : string value of date (hence unique for a month)
+                     value : an object contains date/month/monthName/year
+    */
         let daysBeforeCurrentDay = getdaysBeforeFirstDay(year, month);
         let daysInCurrentMonth = getDaysInCurrentMonth(year, month);
-        //console.log('as', reservedTenantsList);
-        let temp = {}
+        let tempDateObject = {}
         for (let i = 1; i <= 35; i++){
+
             if (i <= daysBeforeCurrentDay){
-                temp[String(i)] = {
+                // empty days before the first day
+                tempDateObject[String(i)] = {
                     isInCurrentMonth: false,
                     day:              "",
                     status:           true
                 }
             } else if  (i <= daysBeforeCurrentDay+daysInCurrentMonth) {
-                temp[String(i)] = {
+                tempDateObject[String(i)] = {
                     isInCurrentMonth: true,
                     day:              i - daysBeforeCurrentDay,
                     month:            month,
@@ -45,116 +57,192 @@ calendarApp.service("mainService", ["$http", function($http){
                     status:           false
                 }
             } else {
-                temp[String(i)] = {
+                // empty days after the last day
+                tempDateObject[String(i)] = {
                     isInCurrentMonth: false,
                     day:              "",
                     status:           true
                 }
             }
         }
-        return temp;
+        return tempDateObject;
     }
 
     function isValidMonth(month){
-        return ((month > 11) | (month < 0)) ? false : true;
+        // returns true if month is in [0-11] 
+        return ((month > 11) || (month < 0)) ? false : true;
     }
 
     function getNextMonth(month, year){
+        // returns next month, year
         return (isValidMonth(month) ? ((month >= 11) ? [0, year+1] : [month+1, year]) : "Month is not correct..");
     }
+
     function getPrevMonth(month, year){
-        return (month <= 0) ? [11, year-1] : [month-1, year];
+        // returns previous month, year
+        return (isValidMonth(month) ? ((month <= 0) ? [11, year-1] : [month-1, year]) : "Month is not correct..");
     }
 
-    function setNextPrevMonthInCalendarObject(temp){
-        self.calendarObject.month = temp[0];
-        self.calendarObject.year = temp[1];
-        getTenants({"year":temp[1],"month":temp[0],"day":1}, {"year":temp[1],"month":temp[0],"day":getDaysInCurrentMonth(temp[1], temp[0])});
+    function setNextPrevMonthInCalendarObject(tempMonthYearList){
+    /* 
+        parameters : month, year 
+        working    : 1. updates the service's calendarObject for the month, year
+                        received in the parameter's list.
+                     2. refreshes the tenants for the new month, year
+        returns    : nothing
+    */
+        self.calendarObject.reservedTenantsList['data']={};
+        self.calendarObject.month = tempMonthYearList[0];
+        self.calendarObject.year = tempMonthYearList[1];
+        getTenants({"year":tempMonthYearList[1],"month":tempMonthYearList[0],"day":1}, 
+                   {"year":tempMonthYearList[1],"month":tempMonthYearList[0],"day":getDaysInCurrentMonth(tempMonthYearList[1], tempMonthYearList[0])});
         self.calendarObject.dateObject = getDateObject(self.calendarObject.year, self.calendarObject.month, 1);
         self.calendarObject.monthName = months[self.calendarObject.month];
     }
 
     this.goToNextMonth = function(){
+    /* 
+        working    : 1. gets the next month, year
+                     2. passes the returned month, year to the 
+                        setNextPrevMonthInCalendarObject function
+                        which updates the calendarObject
+    */
         setNextPrevMonthInCalendarObject(getNextMonth(this.calendarObject.month, this.calendarObject.year));
     }
 
     this.goToPrevMonth = function(){
+    /* 
+        working    : 1. gets the previous month, year
+                     2. passes the returned month, year to the 
+                        setNextPrevMonthInCalendarObject function
+                        which updates the calendarObject
+    */
         setNextPrevMonthInCalendarObject(getPrevMonth(this.calendarObject.month, this.calendarObject.year));
     }
 
     function getUnixFromDateTime(date){
-        console.log(date.year,date.month,date.day)
-        return isValidMonth(date.month) ? moment.tz(new Date(date.year, date.month, date.day, 1), locale).startOf('day').unix() : "Month is not correct..";
+    /* 
+        parameters : date object
+        returns    : unix converted timestamp if valid date given 
+    */
+        return isValidMonth(date.month) ? moment.tz(new Date(date.year, date.month, date.day,5), locale).startOf('day').unix() : "Month is not correct..";
     }
 
     function getDateFromUnix(unix){
-        //console.log(unix,new Date(unix*1000).getDate())
+    /* 
+        parameters : unix timestamp
+        returns    : date object converted from unix timestamp 
+    */
         return moment.unix(unix).tz(locale).startOf('day').date();
     }
 
-    function saveTenants(tenantResponse){
-        this.data = tenantResponse.reserved[0];
-        //console.log(this.data)
-    }
-
     function updateReservedTenantsList(reservedData){
+    /* 
+        parameters : tenant data returned by the server for the given time period
+        working    : 1. creates an object of key/value pairs
+                        key   : string converted reserved date
+                        value : tenant information for the date used as "key"
+                     2. updates the service's calendarObject with the updated tenantList object
+        returns    : nothing
+    */
         reservedTenantsList = {};
         for (let i=0; i<reservedData.length; i++){
             let reservedDate = getDateFromUnix(reservedData[i].time);
-            console.log(reservedDate,reservedData[i],i);
             reservedTenantsList[reservedDate] = reservedData[i];
         }
 
         self.calendarObject.reservedTenantsList['data'] = reservedTenantsList;
     }
     
+    function httpFailure(reason){
+        console.log(reason.data, reason.status + reason.statusText);
+    }
+
     getTenants = async function(
                     from={"year":self.calendarObject.year,"month":self.calendarObject.month,"day":1},
                     to={"year":self.calendarObject.year,"month":self.calendarObject.month,"day":getDaysInCurrentMonth(self.calendarObject.year, self.calendarObject.month)},
                     url="http://localhost:3000"){
-        console.log(from,to)
+    /* 
+        parameters : two objects for start/end date, url
+        working    : 1. gets the tenant data for the given time period 
+                        from the server using the url given
+                     2. sends that date to the updateReservedTenantsList 
+                        function to update calendarObject with the tenantList
+                     3. alerts for errors if any
+        returns    : Promise object is returned
+    */
         let fromUnixTime = getUnixFromDateTime(from);
         let toUnixTime = getUnixFromDateTime(to);
-        console.log(fromUnixTime, toUnixTime,'fromTo')
-        return this.data = $http.get(`${url}/reserve/${fromUnixTime}/${toUnixTime}`)
-            .then( function (response){
+        return $http.get(`${url}/reserve/${fromUnixTime}/${toUnixTime}`)
+            .then(function(response){
                 updateReservedTenantsList(response.data.reserved);
-            }, function(reason){
-                this.error = reason.data;
-            });
+            },function(reason){
+                httpFailure(reason);
+            } );
     }
 
     this.addTenant = function(newTenantName, dateToReserve){
-        console.log(newTenantName,dateToReserve,'service');
+    /* 
+        parameters : new tenant name and the new date to reserve
+        working    : 1. creates url and json date to post to server
+                     2. posts data to the server and updates the
+                        tenant list for current month after this addition
+                     3. alerts for errors if any
+        returns    : Promise object is returned
+    */
         let url = `http://localhost:3000/reserve/`;
         let tenantDataToPush = {
             "tennantName": newTenantName,
             "time": getUnixFromDateTime(dateToReserve),
             "reserved": true
         };
-        $http.post(url, tenantDataToPush).success(function (data, status, headers, config) {
-                getTenants();
-            })
-            .error(function (data, status, header, config) {
-                responseDetails = "Data: " + data +
-                    "<hr />status: " + status +
-                    "<hr />headers: " + header +
-                    "<hr />config: " + config;
+        return $http.post(url, tenantDataToPush).then(function (response){
+                switch(response.status){
+                    case 200:
+                        getTenants();
+                        break;
+                }
+            },function (reason){
+                switch(reason.status){
+                    case -1:
+                        console.log("wrong url, please check it again");
+                        break;
+                    case 400:
+                        console.log(reason.data);
+                        break;
+                }
             });
     }
 
+    // alert("thisISAlert");
+
     this.removeTenant = function(tenantInfo){
-        console.log(tenantInfo,'service');
+    /* 
+        parameters : json object contains tenant to remove 
+        working    : 1. creates url and updates json object to post to server
+                     2. posts data to the server and updates the
+                        tenant list for current month after this removal
+                     3. alerts for errors if any
+        returns    : Promise object is returned
+    */
         let url = `http://localhost:3000/reserve/`;
         tenantInfo["reserved"] = false;
-        $http.post(url, tenantInfo).success(function (data, status, headers, config) {
-                getTenants();
-            })
-            .error(function (data, status, header, config) {
-                responseDetails = "Data: " + data +
-                    "<hr />status: " + status +
-                    "<hr />headers: " + header +
-                    "<hr />config: " + config;
+        return $http.post(url, tenantInfo).then(function (response){
+                switch(response.status){
+                    case 200:
+                        getTenants();
+                        break;
+                }
+            },function (reason){
+                switch(reason.status){
+                    case -1:
+                        console.log("wrong url, please check it again");
+                        break;
+                    case 400:
+                        console.log(reason.data);
+                        break;
+                }
+                console.log(reason)
             });
     }
     

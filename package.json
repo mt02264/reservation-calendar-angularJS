@@ -1,5 +1,7 @@
 {
+  "start":"http-server",
   "dependencies": {
+    "@popperjs/core": "^2.9.3",
     "angular": "1.4",
     "bootstrap": "^5.1.0",
     "http-server": "^13.0.1",

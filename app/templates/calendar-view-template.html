@@ -24,7 +24,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <button class="seven-cols p-4 border btn btn-secondary" ng-disabled="obj.status" ng-repeat="obj in calendar.dateObject" ng-click="showDateDetails(obj,calendar.reservedTenantsList.data[obj.day])" data-toggle="modal" data-target="#exampleModalCenter">{{obj.day}}<br>{{calendar.reservedTenantsList.data[obj.day].tennantName}}</button>
+                            <button class="seven-cols border btn p-4 custom-button-height btn-secondary" ng-disabled="obj.status"  ng-repeat="obj in calendar.dateObject" ng-click="showDateDetails(obj,calendar.reservedTenantsList.data[obj.day])" data-toggle="modal" data-target="#exampleModalCenter"><p class="text-uppercase font-weight-bold">{{obj.day}}<br>{{calendar.reservedTenantsList.data[obj.day].tennantName}}</p></button>
                         </div>
                     </div>
                     <div class="card-footer text-muted">
@@ -45,26 +45,25 @@
                 </button>
                 </div>
                 <div class="modal-body text-center">
-                    <div class="row p-3">
-                        <div class="col" ng-show="tenantInfo == undefined">
-                            <label class="h-5" for="today-date" >New Tenant Name: </label>
-                            <input ng-model="newTenantName">
-                        </div>
-                        <div class="col" ng-show="tenantInfo != undefined">
-                            <h5>Tenant Name: {{tenantInfo.tennantName}}</h5>
-                        </div>
-                    </div>
-                    <div class="row p-3">
-                        <div class="col">
-                            <h5>Stay date: {{dateObj.day}} - {{dateObj.monthName}} - {{dateObj.year}}</h5>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="closeModal()">Close</button>
-                        <button type="button" ng-disabled="newTenantName.length < 2" ng-click="addTenant(newTenantName, dateObj)" ng-show="tenantInfo == undefined" class="btn btn-success">Add Tenant</button>
-                        <button type="button" ng-click="removeTenant(tenantInfo)" ng-show="tenantInfo != undefined" class="btn btn-danger">Remove Tenant</button>
-                    </div>
+                    <form>
+                      <div class="form-group" ng-show="tenantInfo == undefined">
+                        <h5>Tenant Name:</h5>
+                        <input class="form-control" ng-model="newTenantName">
+                        <h5 class="pt-3">Stay date: {{dateObj.day}} - {{dateObj.monthName}} - {{dateObj.year}}</h5>
+                      </div>
+                      <div class="form-group" ng-show="tenantInfo != undefined">
+                        <h5>Tenant Name:</h5>
+                        <input class="form-control" ng-model="tenantInfo.tennantName" readonly>
+                        <h5 class="pt-3">Stay date: {{dateObj.day}} - {{dateObj.monthName}} - {{dateObj.year}}</h5>
+                      </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="closeModal()">Close</button>
+                    <button type="button" ng-disabled="newTenantName.length < 2" ng-click="addTenant(newTenantName, dateObj)" ng-show="tenantInfo == undefined" class="btn btn-success">Add Tenant</button>
+                    <button type="button" ng-click="removeTenant(tenantInfo)" ng-show="tenantInfo != undefined" class="btn btn-danger">Remove Tenant</button>
                 </div>
             </div>
         </div>
+    </div>
 </div>
