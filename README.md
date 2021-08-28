@@ -1,4 +1,4 @@
-# Calend# Calendar Reserver (AngularJS)
+# Calendar Reserver (AngularJS)
 
 Calendar Reserver is a front-end application developed as a hiring task for Stellic Inc.
 

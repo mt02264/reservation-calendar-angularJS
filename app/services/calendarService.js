@@ -148,8 +148,7 @@ calendarApp.service("calendarService", ["$http", function($http){
             let reservedDate = getDateFromUnix(reservedData[i].time);
             reservedTenantsList[reservedDate] = reservedData[i];
         }
-
-        self.calendarObject.reservedTenantsList['data'] = reservedTenantsList;
+        self.calendarObject.reservedTenantsList['data'] = ((reservedData.length == 0) ? {"0" : {"tennantName": "No Room Reserved"}} : reservedTenantsList);
         self.calendarObject.atInitialLoad = false;
     }
     

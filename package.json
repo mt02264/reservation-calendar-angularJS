@@ -1,5 +1,5 @@
 {
-  "start":"http-server",
+  "start": "http-server ./app/",
   "dependencies": {
     "@popperjs/core": "^2.9.3",
     "angular": "1.4",
@@ -7,5 +7,25 @@
     "http-server": "^13.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33"
-  }
+  },
+  "name": "reservation-calendar-angularjs",
+  "description": "Calendar Reserver is a front-end application developed as a hiring task for Stellic Inc.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "http-server ./app -p 8000 -c-1",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mt02264/reservation-calendar-angularJS.git"
+  },
+  "keywords": ["angular","calendar"],
+  "author": "Muhammad Tahir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mt02264/reservation-calendar-angularJS/issues"
+  },
+  "homepage": "https://github.com/mt02264/reservation-calendar-angularJS#readme"
 }

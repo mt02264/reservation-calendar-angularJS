@@ -8,3 +8,8 @@
 .custom-button-height{
     height: 120px !important;
 }
+
+.custom-margin{
+    overflow: scroll visible;
+    scroll-behavior: smooth;
+}
