@@ -1,5 +1,9 @@
-calendarApp.controller("modalController", ["$scope", "mainService", "$http", function($scope, mainService, $http){
-    
+calendarApp.controller("modalController", ["$scope", "calendarService", "$http", function($scope, calendarService, $http){
+
+    $scope.data = calendarService.data;
+    $scope.newTenantName = "";
+    $scope.isModalVisible=false;
+
     $scope.$on('objectBroadCastToModalController', function(event, data) {
     /*  
         listening to parent's broadcast, 
@@ -10,17 +14,13 @@ calendarApp.controller("modalController", ["$scope", "mainService", "$http", fun
         $scope.isModalVisible=true;
     });
 
-    $scope.data = mainService.data;
-    $scope.newTenantName = "";
-    $scope.isModalVisible=false;
-
     $scope.addTenant = function(newTenantName, dateToReserve){
     /* 
         closes the modal component and
         calls mainService addTenant function to reserve the room.
     */
         $scope.closeModal();
-        mainService.addTenant(newTenantName, dateToReserve);
+        calendarService.addTenant(newTenantName, dateToReserve);
     }
 
     $scope.removeTenant = function(tenantInfo){
@@ -29,7 +29,7 @@ calendarApp.controller("modalController", ["$scope", "mainService", "$http", fun
         calls mainService removeTenant function to unreserve the room.
     */
         $scope.closeModal();
-        mainService.removeTenant(tenantInfo);
+        calendarService.removeTenant(tenantInfo);
     }
     
     $scope.closeModal = function(){

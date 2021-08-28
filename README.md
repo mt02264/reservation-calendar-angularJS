@@ -1,16 +1,17 @@
-# Calendar Reserver (AngularJS)
+# Calend# Calendar Reserver (AngularJS)
 
 Calendar Reserver is a front-end application developed as a hiring task for Stellic Inc.
 
 
 ## Table of Contents
 
-- [Libraries Dependency](#-Libraries-Dependency)
-- [How to run?](#-How-to-run?)
-- [Project Structure](#-Project-Structure)
-- [Contributing](#-Contributing)
-- [Credits](#-Credits)
-- [License](#-License)
+- [Libraries Dependency](#libraries-dependency)
+- [How to run?](#how-to-run)
+- [Project Structure](#project-structure)
+- [Changes in Server](#changes-in-server)
+- [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
 
 
 
@@ -78,6 +79,14 @@ npm install --global http-server
 
      - **templates** : folder contains the template used in index.html
 
+
+## Changes in Server
+
+After consulting with [Rukhsar](rukhsar@stellic.com), there is one thing that I have changed in server.js file: 
+
+- Changed the locale from 'Asia/Dubai' to 'GMT'. This change is done by commenting out line 12, and a new line below it to reflect the change in the locale. The code snapshot below highlights the change.
+![changes-in-serverjs](images/changes-in-serverjs.png)
+
 ## Contributing
 It is a standalone project. No contribution is required. However, you can still clone this repository and update it to your suiting and have fun!
 
@@ -98,5 +107,3 @@ Even though this project wasn't completed in a team, there are still some resour
 Open Source. 
 
 
-
-Updated server.js and removed the startOf("day") from the date to locale time conversion
